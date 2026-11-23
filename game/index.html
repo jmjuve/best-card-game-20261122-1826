@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ember Duel — Cards of the Four Winds</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="table">
+  <header id="topbar">
+    <div class="brand">🔥 EMBER DUEL <span>— Cards of the Four Winds</span></div>
+    <div class="top-right">
+      <span id="scoreLine">Wins 0 · Losses 0</span>
+      <button id="soundBtn" type="button" title="Toggle sound (M)">Sound: On</button>
+      <button id="helpBtn" type="button" title="How to play (H)">How to play</button>
+    </div>
+  </header>
+
+  <!-- Opponent -->
+  <section id="foeArea" class="side foe">
+    <div class="portrait foe-portrait" aria-label="Rook, the Stone Warden">🗿</div>
+    <div class="side-info">
+      <div class="side-name">Rook, the Stone Warden <span class="tag">AI opponent</span></div>
+      <div class="life-row">
+        <span class="life-label">Life</span>
+        <div class="life-bar"><div id="foeLifeFill" class="life-fill"></div><span id="foeLifeText" class="life-text">30 / 30</span></div>
+        <span id="foeShield" class="shield">🛡 0</span>
+      </div>
+      <div class="mana-row"><span class="mana-label">Mana</span><span id="foeMana" class="mana-pips"></span></div>
+    </div>
+    <div id="foeHand" class="hand foe-hand" aria-label="Opponent's hand"></div>
+  </section>
+
+  <!-- Middle: last play + log -->
+  <section id="midArea">
+    <div id="lastPlay" class="last-play">The duel begins. Play a card, then end your turn.</div>
+    <div id="log" class="log" aria-live="polite"></div>
+  </section>
+
+  <!-- Player -->
+  <section id="youArea" class="side you">
+    <div class="portrait you-portrait" aria-label="You, the Ember Caller">🧙</div>
+    <div class="side-info">
+      <div class="side-name">You, the Ember Caller <span class="tag">Turn <span id="turnNum">1</span></span></div>
+      <div class="life-row">
+        <span class="life-label">Life</span>
+        <div class="life-bar"><div id="youLifeFill" class="life-fill"></div><span id="youLifeText" class="life-text">30 / 30</span></div>
+        <span id="youShield" class="shield">🛡 0</span>
+      </div>
+      <div class="mana-row"><span class="mana-label">Mana</span><span id="youMana" class="mana-pips"></span>
+        <span id="deckInfo" class="deck-info"></span>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="endTurnBtn" type="button">End Turn ⏎</button>
+      <button id="restartBtn" type="button">Restart ↺</button>
+    </div>
+  </section>
+
+  <section id="yourHandWrap">
+    <div class="hand-label">Your hand — click a card to play it (keys 1–7) · <span id="handHint"></span></div>
+    <div id="yourHand" class="hand your-hand" aria-label="Your hand"></div>
+  </section>
+
+  <footer id="hintBar">Click a card to play it · <b>1–7</b> select card · <b>Enter</b> end turn · <b>R</b> restart · <b>M</b> sound</footer>
+</div>
+
+<!-- Title screen -->
+<div id="titleScreen" class="overlay">
+  <div class="panel title-panel">
+    <div class="title-flame">🔥</div>
+    <h1>EMBER DUEL</h1>
+    <div class="subtitle">Cards of the Four Winds</div>
+    <p class="tagline">A duel of embers and tides. Outplay Rook, the Stone Warden —<br>
+    reduce his life to 0 before he reduces yours.</p>
+    <div class="rules-mini">
+      <div><b>🔥 Flame</b> — strikes the foe</div>
+      <div><b>💧 Tide</b> — heals your wounds</div>
+      <div><b>🍃 Leaf</b> — raises a shield</div>
+      <div><b>🪨 Stone</b> — heavy, crushing blows</div>
+    </div>
+    <p class="how">Each turn you gain mana and draw a card. Play cards, then press <b>End Turn</b>.<br>
+    First to 0 life loses. Good luck, Ember Caller.</p>
+    <button id="startBtn" type="button" class="big-btn">▶ &nbsp;Begin the Duel</button>
+    <div class="keys-hint">Mouse + keyboard · 1–7 play a card · Enter ends the turn · R restarts</div>
+  </div>
+</div>
+
+<!-- Win screen -->
+<div id="winScreen" class="overlay hidden">
+  <div class="panel end-panel win">
+    <div class="end-emoji">🏆</div>
+    <h1>VICTORY!</h1>
+    <p class="end-text">Rook crumbles to embers. The Four Winds sing your name,<br>Ember Caller — the table is yours.</p>
+    <p id="winStats" class="end-stats"></p>
+    <button id="winAgainBtn" type="button" class="big-btn">▶ &nbsp;Duel Again</button>
+  </div>
+</div>
+
+<!-- Loss screen -->
+<div id="lossScreen" class="overlay hidden">
+  <div class="panel end-panel loss">
+    <div class="end-emoji">💀</div>
+    <h1>DEFEAT</h1>
+    <p class="end-text">Rook stands unmoved as your last ember fades.<br>The winds fall silent — but a Caller never stays down.</p>
+    <p id="lossStats" class="end-stats"></p>
+    <button id="lossAgainBtn" type="button" class="big-btn">▶ &nbsp;Duel Again</button>
+  </div>
+</div>
+
+<!-- Help -->
+<div id="helpScreen" class="overlay hidden">
+  <div class="panel help-panel">
+    <h2>How to play</h2>
+    <ul>
+      <li><b>Goal:</b> reduce Rook's life from 30 to 0 before he does the same to you.</li>
+      <li><b>Mana:</b> each turn you gain mana crystals (turn 1 = 1, up to 10). Cards cost mana.</li>
+      <li><b>Cards:</b> 🔥 Flame deals damage · 💧 Tide heals you · 🍃 Leaf gives you shield (absorbs damage) · 🪨 Stone deals heavy damage.</li>
+      <li><b>Shield</b> absorbs damage first, then breaks. Healing cannot exceed 30 life.</li>
+      <li><b>Ember Surge</b> adds +5 to your next attack this turn. <b>Phoenix Feather</b> and <b>Deep Current</b> draw an extra card.</li>
+      <li><b>End Turn</b> lets Rook play. He draws, gains mana and plays his best cards — watch his shield.</li>
+      <li><b>Keys:</b> 1–7 play a card, Enter ends the turn, R restarts, M toggles sound, H shows this help.</li>
+    </ul>
+    <button id="closeHelpBtn" type="button" class="big-btn">Close</button>
+  </div>
+</div>
+
+<p id="status" role="status" aria-live="polite"></p>
+<script type="module" src="./game.js"></script>
+</body>
+</html>
